@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
-const bodyParser =require('body-parser')
+const bodyParser =require('body-parser');
+const multer = require('multer'); //utiliser pour upload des formulaires dans notre cas mais aussi des fichiers
+const upload = multer();
 const PORT = 3000;
 let frenchMovies =[];
 
@@ -22,17 +24,18 @@ app.get('/movies',(req,res) => {
 });
 
 //POST :
-var urlencodedParser = bodyParser.urlencoded({ extended: false});
-app.post('/movies', urlencodedParser,(req, res) => {
-    console.log('Le titre : ',req.body.movietitle);
-    console.log("L'annèe:",req.body.movieyear);
-    const newMovie = { title : req.body.movietitle, year :req.body.movieyear};
-    // frenchMovies.push(newmovie);  $[ la nouvelle version est ci-dessous]
-    frenchMovies = [...frenchMovies, newMovie];
-    console.log(frenchMovies);
+// var urlencodedParser = bodyParser.urlencoded({ extended: false});
+// app.post('/movies', urlencodedParser,(req, res) => {
+//     console.log('Le titre : ',req.body.movietitle);
+//     console.log("L'annèe:",req.body.movieyear);
+//     const newMovie = { title : req.body.movietitle, year :req.body.movieyear};
+//     // frenchMovies.push(newmovie);  $[ la nouvelle version est ci-dessous]
+//     frenchMovies = [...frenchMovies, newMovie];
+//     console.log(frenchMovies);
 
-    res.sendStatus(201);
-});
+//     res.sendStatus(201);
+// });
+//le bloc ci-dessus a été commenté suite à l'installation de multer qui fera le lien entre le serveur et le formulaire
 
 
 app.get('/movies/add', (req,res) => {
