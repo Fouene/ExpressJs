@@ -36,7 +36,18 @@ app.get('/movies',(req,res) => {
 //     res.sendStatus(201);
 // });
 //le bloc ci-dessus a été commenté suite à l'installation de multer qui fera le lien entre le serveur et le formulaire
-
+app.post('/movies', upload.fields([]), (req, res) => {
+    if (!req.body) {
+        return res.sendStatus(500);
+    }else {
+        const formData = req.body;
+        console.log('formData : ', formData);
+        const newMovie = { title : req.body.movietitle, year :req.body.movieyear};
+        frenchMovies = [...frenchMovies, newMovie];
+        console.log(frenchMovies);
+        res.sendStatus(201);
+    }
+})
 
 app.get('/movies/add', (req,res) => {
     res.send(`ajouter un film par içi`);
@@ -53,6 +64,9 @@ app.get('/',(req,res) => {
     // res.send('Hello World !!');
     res.render('index')
 });
+app.get('/movie-search',(req,res) => {
+    res.render('movie-search');
+})
 
 app.listen(3000,() => {
     console.log(`listening on port ${PORT}`);

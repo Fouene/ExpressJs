@@ -44,7 +44,7 @@
                         console.error('request failed', error);
                      })
                 } else{
-
+                    // si fetch n'est pas supporté par le navigateur, il faut ajouter la possibilité de le faire avec le XHR(section 4.19)
                 }
             }
 
@@ -53,8 +53,8 @@
                     let newMovieDiv = document.createElement('div');
                     const movietitle = document.getElementById('movietitle').value;
                     const movieyear = document.getElementById('movieyear').value;
-                    newMovieDiv.innerHTML = movietitle +' '+'('+movieyear+')'; //ou sinon avec jquery : ligne ci-dessous
-                    // newMovieDiv.innerHTML = `${movietitle} (${movieyear})`;
+                    // newMovieDiv.innerHTML = movietitle +' '+'('+movieyear+')'; //ou sinon avec jquery : ligne ci-dessous
+                    newMovieDiv.innerHTML = `${movietitle} (${movieyear})`;
                     document.querySelector('.french-movies').appendChild(newMovieDiv);
                     form.reset();
                 }
