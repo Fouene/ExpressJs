@@ -2,7 +2,10 @@ const express = require('express');
 const app = express();
 const bodyParser =require('body-parser');
 const multer = require('multer'); //utiliser pour upload des formulaires dans notre cas mais aussi des fichiers
+const { urlencoded } = require('body-parser');
 const upload = multer();
+const jwt = require ('jsonwebtoken');
+
 const PORT = 3000;
 let frenchMovies =[];
 
@@ -23,8 +26,9 @@ app.get('/movies',(req,res) => {
     res.render('movies', { movies: frenchMovies, title: title});
 });
 
+var urlencodedParser = bodyParser.urlencoded({ extended: false});
+
 //POST :
-// var urlencodedParser = bodyParser.urlencoded({ extended: false});
 // app.post('/movies', urlencodedParser,(req, res) => {
 //     console.log('Le titre : ',req.body.movietitle);
 //     console.log("L'annèe:",req.body.movieyear);
@@ -66,7 +70,28 @@ app.get('/',(req,res) => {
 });
 app.get('/movie-search',(req,res) => {
     res.render('movie-search');
-})
+});
+
+app.get('/login', (req, res) => {
+    res.render('login', { title:'Connexion'});
+});
+
+const fakeUser = { email: 'testuser@testmail.fr', password: 'qsd' };
+const secret = 'qsdjS12ozehdoIJ123DJOZJLDSCqsdeffdg123ER56SDFZedhWXojqshduzaohduihqsDAqsdq';
+
+app.post('/login', urlencodedParser, (req, res) => {
+    console.log('login post', req.body);
+    if (!req.body) {
+        return res.sendStatus(500);
+    } else {
+        if(fakeUser.email === req.body.email && fakeUser.password === req.body.password) {
+            const myToken = jwt.sign({iss:'http://expressmovies.fr',user: 'Sam', role :'moderator'}, secret);
+            res.json(myToken);
+        } else {
+            res.sendStatus(401);
+        }
+    }
+});
 
 app.listen(3000,() => {
     console.log(`listening on port ${PORT}`);
