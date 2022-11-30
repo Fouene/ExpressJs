@@ -23,6 +23,8 @@
 			</div>
 			<div id="profile" style="display:none">
 				<button id="disconnectBtn">Déconnexion</button>
+				<button id="display-payload">Voir le payload</button>
+				<div id="decoded-payload"></div>
 			</div>
 
 		</div>
@@ -37,8 +39,14 @@
 			var loginArea = document.querySelector('#login');
 			var profileArea = document.querySelector('#profile');
 
+			var displayPayloadBtn = document.querySelector('#display-payload');
+			displayPayloadBtn.addEventListener('click',displayPayload);
+
 			var disconnectBtn = document.querySelector('#disconnectBtn');
 			disconnectBtn.addEventListener('click',disconnect);
+			var connectionLinkArea = document.querySelector('#connectionLink');
+			handleFormDisplay();
+
 			function loginUser(event) {
                 loginUserWithXHR(event);
 			};
@@ -67,13 +75,37 @@
 				var payLoad = "email=" + email + "&" + "password=" + password;
 				xhr.send(payLoad);
 			};
+			function handleFormDisplay() {
+				if (localStorage.getItem('token')) {
+					switchToLoggedinMode();
+				}else {
+					switchToLoggedOutMode();
+				}
+			};
+
 			function switchToLoggedinMode() {
 				loginArea.style.display = 'none';
 				profileArea.style.display = 'block';
+				connectionLinkArea.innerHTML = '<a href="/login">déconnexion</a>';
 			};
 			function switchToLoggedOutMode() {
 				loginArea.style.display = 'block';
 				profileArea.style.display = 'none';
+				connectionLinkArea.innerHTML = '<a href="/login">connexion</a>';
+			};
+			function displayPayload(){
+				var payload = parsejwt();
+				var decodedPayloadDiv = document.querySelector('#decoded-payload');
+				decodedPayloadDiv.innerHTML = '<pre>' + JSON.stringify(payload) + '</pre>';
+			};
+			function parsejwt(){
+				var tokenFromStorage = localStorage.getItem('token');
+				if (tokenFromStorage){
+					var base64Payload = tokenFromStorage.split('.')[1];
+					return JSON.parse(window.atob(base64Payload));
+				}else {
+					return 'no token to parse !'
+				}
 			};
 			function disconnect() {
 				switchToLoggedOutMode();
