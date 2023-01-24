@@ -5,15 +5,21 @@ const multer = require('multer'); //utiliser pour upload des formulaires dans no
 const { urlencoded } = require('body-parser');
 const upload = multer();
 const jwt = require ('jsonwebtoken');
+const expressJwt = require('express-jwt');
 
 const PORT = 3000;
 let frenchMovies =[];
+const secret = 'qsdjS12ozehdoIJ123DJOZJLDSCqsdeffdg123ER56SDFZedhWXojqshduzaohduihqsDAqsdq';
 
 app.use('/public', express.static('public'));
 // app.use(bodyParser.urlencoded({ extended: false }));
 
+app.use(expressJwt({ secret : secret}).unless({path: ['/', '/movies','/movie-search','/login']}));
+
 app.set('views', './views');
 app.set('view engine','ejs');
+
+
 
 app.get('/movies',(req,res) => {
     const title = 'Films Français des 30 dernières annèes'
@@ -77,7 +83,6 @@ app.get('/login', (req, res) => {
 });
 
 const fakeUser = { email: 'testuser@testmail.fr', password: 'qsd' };
-const secret = 'qsdjS12ozehdoIJ123DJOZJLDSCqsdeffdg123ER56SDFZedhWXojqshduzaohduihqsDAqsdq';
 
 app.post('/login', urlencodedParser, (req, res) => {
     console.log('login post', req.body);
@@ -91,6 +96,11 @@ app.post('/login', urlencodedParser, (req, res) => {
             res.sendStatus(401);
         }
     }
+});
+
+app.get('/member-only',(req,res) => {
+    console.log('req.user', req.user);
+    res.send(req.user);
 });
 
 app.listen(3000,() => {

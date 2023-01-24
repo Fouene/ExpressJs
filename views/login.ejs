@@ -25,6 +25,9 @@
 				<button id="disconnectBtn">Déconnexion</button>
 				<button id="display-payload">Voir le payload</button>
 				<div id="decoded-payload"></div>
+				<div>
+					<a href="#" id="member-only">Espace Membre</a>
+				</div>
 			</div>
 
 		</div>
@@ -46,6 +49,9 @@
 			disconnectBtn.addEventListener('click',disconnect);
 			var connectionLinkArea = document.querySelector('#connectionLink');
 			handleFormDisplay();
+
+			var memberOnlyLink = document.querySelector("#member-only");
+			memberOnlyLink.addEventListener('click', makeRequestwithToken);
 
 			function loginUser(event) {
                 loginUserWithXHR(event);
@@ -112,6 +118,26 @@
 				localStorage.removeItem('token');
 			}
 
+			function makeRequestwithToken(evt) {
+				evt.preventDefault(); //!\
+				var page = this.id;
+				var tokenFromStorage = localStorage.getItem('token');
+				var config ={};
+
+				if (tokenFromStorage) {
+					config.headers = {'Authorization':'Bearer ' +JSON.parse(tokenFromStorage)}
+				}
+
+				axios.get(
+					'http://localhost:3000/' + page,
+					config
+				).then(res => {
+					console.log('success');
+					console.log(res);
+				}).catch(err =>{
+					console.error('makeRequestwithToken err', err);
+				})
+			}
 		</script>
 	</body>
 </html>
