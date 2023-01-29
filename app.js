@@ -6,6 +6,24 @@ const { urlencoded } = require('body-parser');
 const upload = multer();
 const jwt = require ('jsonwebtoken');
 const expressJwt = require('express-jwt');
+const mongoose = require('mongoose');
+
+//pour se connecter à la DB :
+mongoose.connect('mongodb+srv://SafoueneMani:2JWthijppjiUI7dw@expressmovie.m6apdyc.mongodb.net/?retryWrites=true&w=majority');
+const db = mongoose.connection;
+db.on('error',console.error.bind(console,'connection error: cannot connect to my DB'));
+db.once('open',()=>{
+    console.log('connected to the DB !');
+});
+
+//création du schéma :
+const movieSchema = mongoose.Schema({
+    movietitle: String,
+    movieyear : Number
+});
+//création du modèle :
+const Movie = mongoose.model('Movie', movieSchema);
+
 
 const PORT = 3000;
 let frenchMovies =[];
@@ -23,13 +41,16 @@ app.set('view engine','ejs');
 
 app.get('/movies',(req,res) => {
     const title = 'Films Français des 30 dernières annèes'
-    frenchMovies = [
-        {title: 'Le fabuleux destin de Safouene', year: 2001},
-        {title: 'Forrest Gump', year: 1998},
-        {title: 'Terminator', year: 2015},
-        {title: 'Avatar', year: 2022}
-    ];
-    res.render('movies', { movies: frenchMovies, title: title});
+    frenchMovies = [];
+    Movie.find((err,movies)=>{
+        if(err) {
+            console.error('could not retrieve movies from DB');
+            res.sendStatus(500);
+        } else {
+            frenchMovies = movies;
+            res.render('movies', { movies: frenchMovies, title: title});
+        }
+    })
 });
 
 var urlencodedParser = bodyParser.urlencoded({ extended: false});
@@ -52,10 +73,18 @@ app.post('/movies', upload.fields([]), (req, res) => {
     }else {
         const formData = req.body;
         console.log('formData : ', formData);
-        const newMovie = { title : req.body.movietitle, year :req.body.movieyear};
-        frenchMovies = [...frenchMovies, newMovie];
-        console.log(frenchMovies);
-        res.sendStatus(201);
+        const title = req.body.movietitle;
+        const year = req.body.movieyear;
+        const myMovie = new Movie({ movietitle: title, movieyear : year});
+        myMovie.save((err, savedMovie) => {
+            if(err) {
+                console.error(err);
+                return;
+            } else {
+                console.log(savedMovie);
+                res.sendStatus(201);
+            }
+        })
     }
 })
 
